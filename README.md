@@ -31,7 +31,7 @@ and the layout of messages displayed!
 Import the "valida.js" on the HEAD of your page:
 
 ```
-<script type="text/javascript" src="valida.js" ></script>
+<script type="text/javascript" src="valida.2.0.7.js" ></script>
 ```
 
 Set what kind of fields are required and has filters:
@@ -45,7 +45,7 @@ Set what kind of fields are required and has filters:
 Then, you just need call it:
 
 ```
-<script type="text/javascript" src="valida.js" >
+<script type="text/javascript" src="valida.2.0.7.js" >
     jQuery(document).ready(function(){
        $('your-form').valida();
     });
