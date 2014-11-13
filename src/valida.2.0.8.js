@@ -21,10 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * @requires jQuery v1.9 or above
- * @version 2.0.7
+ * @version 2.0.8
  * @cat Plugins/Form Validation
- * @author Rogério Taques (rogerio@awin.com.br | http://awin.com.br)
- * @see http://code.google.com/p/jquery-valida/
+ * @author Rogério Taques (rogerio.taques@gmail.com)
+ * @see https://github.com/rogeriotaques/valida
  * 
  * Contributors:
  * - Kosuke Hiraga (hiraga@brijcs.co.jp)
@@ -45,7 +45,7 @@
 
 	"use strict";
 	
-	var version = '2.0.7',
+	var version = '2.0.8',
 	
 	// default options
 	defaults = {
@@ -376,7 +376,7 @@
 			f.find('button, input[type=reset]').off('valida');
 			f.find('button, input[type=reset]').unbind('.valida');
 			
-			// unbind all for fields
+			// unbind all form fields
 			f.find('input, select, textarea').off('valida');
 			f.find('input, select, textarea').unbind('.valida');
 			
