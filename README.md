@@ -2,6 +2,8 @@
 
 Valida is a jQuery plugin which provides an easy, fast and lightweight way to make form validations on client-side. It's source-code (minified) has about *8Kb*.
 
+[Live Demo](http://awin.com.br/valida/)
+
 ##Details
 
 Validating a form on client-side, using Javascript, can be (at least for me is) a very boring and slower task! 
