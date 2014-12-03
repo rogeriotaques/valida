@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * @requires jQuery v1.9 or above
- * @version 2.0.8
+ * @version 2.0.9
  * @cat Plugins/Form Validation
  * @author Rogério Taques (rogerio.taques@gmail.com)
  * @see https://github.com/rogeriotaques/valida
@@ -38,14 +38,14 @@
  * 		Minor bugs caused by rewritten were fixed.
  * 		The 'destroy' method was included.
  * 		Defined a namespace for all plugin.
- * 
+ *      The 'partial' method was included.
  */
 
-(function($){
+(function ( $ ) {
 
 	"use strict";
 	
-	var version = '2.0.8',
+	var version = '2.0.9',
 	
 	// default options
 	defaults = {
@@ -122,6 +122,9 @@
 		}
 		
 	}, // filters
+        
+    // define extended 'options' globally
+    o = {},
 	
 	methods = {
 		
@@ -141,7 +144,7 @@
 		 */
 		init: function(options) 
 		{
-			var o = $.extend(defaults, options);
+			o = $.extend({}, defaults, options);
 			
 			return this.each( function() 
 			{
@@ -192,7 +195,7 @@
 								 (el.is('input') && el.prop('type') === 'checkbox' && el.is('[required]') && !el.is(':checked')) ||
 								 (el.is('input') && el.prop('type') !== 'checkbox' && el.is('[required]') && el.val() === '') )
 							{
-								_show_error(el, o, el.is('[type=checkbox]'));
+								_show_error(el, el.is('[type=checkbox]'));
 								
 							} // empty, unselected or unchecked fields
 							
@@ -240,7 +243,7 @@
 						
 							if (!el.is(':checked'))
 							{
-								_show_error(el, o, el.is('[type=checkbox]'));
+								_show_error(el, el.is('[type=checkbox]'));
 							}
 							
 						});
@@ -254,12 +257,12 @@
 						{
 							if (el.val() !== '')
 							{
-								_typing_handler(el, o);
+								_typing_handler(el);
 							}
 							
 						}).on('keydown.valida', function(e)
 						{
-							_typing_handler(el, o);
+							_typing_handler(el);
 							
 						});
 					}
@@ -267,7 +270,7 @@
 				}); // elements
 				
 				// when submit, than really validates
-				f.on('submit.valida', function(e)
+				f.on('submit.valida', function( e )
 				{
 					var err = false;
 					
@@ -294,36 +297,13 @@
 							el.html(o.messages.submit || 'Wait ...');
 						}
 					});
-				
+					
 					// get required elements
 					f.find('input, select, textarea').each(function(i, el)
 					{
-						el = $(el);
-						
-						// sometimes needs to ignore ...
-						if ( _ignore_this_element(el) )
-						{
-							return;
-						
-						} // ignore
-
-						if ( el.is('[required]') && ( ( !el.is('[type=checkbox]') && el.val() == '' ) || (el.is('[type=checkbox]') && !el.is(':checked')) || (el.is('select') && !el.find('option').length) ) )
-						{
-							
-							err = true;
-							_show_error(el, o, el.is('[type=checkbox]'));
-							
-						} // empty
-
-						// sanitize filters
-						else if(o.use_filter && el.attr('filter') && !_is_filter_valid(el, o) )
-						{
-							
-							err = true;
-							_show_warning(el, o, el.is('[type=checkbox]'));
-							
-						} // filters
-						
+						el  = $(el);
+                        err = !_partial_validation( el, true, false, err );
+                        
 					}); // required elements
 
 					// callback for 'after validation'
@@ -331,7 +311,7 @@
 					{
 						err = !o.after_validate(e, err);
 					}
-
+					
 					if (err)
 					{
 						// take control and avoid goes on ...
@@ -352,6 +332,8 @@
 								el.html(el.data('old-value'));
 							}
 						});
+						
+						return false;
 						
 					} // err
 					
@@ -389,21 +371,96 @@
 
 			f.valida = null;
 			
-		} // destroy 
+		}, // destroy 
+        
+        /**
+         * A public method of partial validation
+         */
+        partial: function( el, show_error, force_clear )
+        {
+            
+            return _partial_validation( el, show_error, force_clear );
+            
+        } // partial
 		
 	}; // methods
+        
+    /**
+     * Run the validation only for given element(s).
+     * It's useful in cases that the form is splited in steps and makes necessary to validate each step in separated.
+     * 
+     * @param string    el          -   A string containing any identifier from element, such as: id, name or any css or html markup.
+     * @param boolean   show_error  -   Whenever an error message should be placed or not. Default is true.
+     * @param boolean   force_clear -   Whenever previous error message should be cleared or not. Default is true.
+     * @param boolean	prev_state	- 	Previous error state. Default is false.
+     *
+     * @return boolean              -   true when everything goes alright and false when there are errors
+     */
+    function _partial_validation ( el, show_error, force_clear, prev_state )
+    {
+        
+        var err = (prev_state === undefined ? false : prev_state);
+
+        show_error  = (show_error === undefined ? true : show_error);
+        force_clear = (force_clear === undefined ? true : force_clear);
+
+        el = (typeof el == 'object' ? el : $(el));
+        
+        if (force_clear)
+        {
+
+            _clear( el );   // reset previous error messages ...  
+
+        }
+
+        // sometimes needs to ignore ...
+        if ( !el.length || _ignore_this_element(el) )
+        {
+
+            return false;
+
+        } // ignore
+
+        if ( el.is('[required]') && ( ( !el.is('[type=checkbox]') && el.val() == '' ) || (el.is('[type=checkbox]') && !el.is(':checked')) || (el.is('select') && !el.find('option').length) ) )
+        {
+
+            err = true;
+
+            if (show_error)
+            {
+                _show_error(el, el.is('[type=checkbox]'));
+            }
+
+        } // empty
+
+        // sanitize filters
+        else if(o.use_filter && el.attr('filter') && !_is_filter_valid(el) )
+        {
+
+            err = true;
+
+            if (show_error)
+            {
+                _show_warning(el, el.is('[type=checkbox]'));
+            }
+
+        } // filters
+
+        return !err;
+
+    } // _partial_validation
 	
 	/**
 	 * Hand typing to validate the content of fields
 	 */
-	function _typing_handler(el, o)
+	function _typing_handler( el )
 	{
 		var is_filter_valid = !_is_filter_valid(el, o);
 		
 		// sanitize filters
 		if(o.use_filter && el.attr('filter') && is_filter_valid)
 		{
-			_show_warning(el, o, el.is('[type=checkbox]'));
+			_show_warning(el, el.is('[type=checkbox]'));
 		}
 		
 		else if (el.val() !== '' && el.attr('filter') && !is_filter_valid)
@@ -437,7 +494,7 @@
 	/**
 	 * Teste if the given element's filter is valid.
 	 */
-	function _is_filter_valid(el)
+	function _is_filter_valid( el )
 	{
 		var list	= el.attr('filter') !== undefined && el.attr('filter').indexOf('|') !== -1 ? el.attr('filter').split('|') : [el.attr('filter')],
 			pattern = /^(\w\d)+/, 
@@ -496,7 +553,7 @@
 	/**
 	 * Shows the 'warning', compatible with boostrap
 	 */
-	function _show_warning( el, o, is_checkbox )
+	function _show_warning( el, is_checkbox )
 	{
 		var msg = (el.data('invalid') || (o.messages.invalid ? o.messages.invalid : 'This field has invalid data')),
 			place = (el.data('place-after') || el);
@@ -525,7 +582,7 @@
 	/**
 	 * Shows 'error', compatible with bootstrap
 	 */
-	function _show_error( el, o, is_checkbox )
+	function _show_error( el, is_checkbox )
 	{
 		var msg = (el.data('required') || (o.messages.required ? o.messages.required : 'This field is required')),
 			place = (el.data('place-after') || el),
@@ -598,7 +655,7 @@
 		return !el.is('input') || (el.is('input') && $.inArray(el.prop('type'), types_of_elements_to_ignore)) === -1 ? false : true;
 		
 	} // _ignore_element
-	
+    
 	/**
 	 * Attach the plugin into jQuery.
 	 */
