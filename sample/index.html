@@ -86,6 +86,11 @@
 			.at-description > span {
 				/* into description paragrapher, right after TEXTAREA fields there are 2 span TAGs. */
 			}
+            
+            .at-required-highlight {
+                /* highlight required form fields */
+                color: red;
+            }
 			
 		</style>
 		
@@ -146,10 +151,8 @@
 				<h4 >INPUT CHECKBOX:</h4>
 			
 				<div class="checkbox" >
-					<label for="field-3" >
-						<input type="checkbox" name="field-3" id="field-3" required="true" value="y" />
-						Field 3: (required)
-					</label>
+                    <input type="checkbox" name="field-3" id="field-3" required="true" value="y" />
+					<label for="field-3" >Field 3: (required)</label>
 				</div>
 				
 				<hr >
@@ -224,7 +227,7 @@
         </script>
 		
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script type="text/javascript" src="../src/valida.2.0.9.min.js"></script>
+		<script type="text/javascript" src="../src/valida.2.1.0.js"></script>
 		<script type="text/javascript" >
 			
 			

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * @requires jQuery v1.9 or above
- * @version 2.0.9
+ * @version 2.1.0
  * @cat Plugins/Form Validation
  * @author Rogério Taques (rogerio.taques@gmail.com)
  * @see https://github.com/rogeriotaques/valida
@@ -33,6 +33,8 @@
 /**
  * CHANGELOG
  * 
+ * 2.1  Added the cappability of highlight required fields.
+ *
  * 2.0 	First release. Entirely rewritten to become lighweight and to provide support for bootstrap.
  * 		Some improvements in filters (url and phone_br) and callbacks (after and before validations). Special thanks for Kosuke Hiraga. 
  * 		Minor bugs caused by rewritten were fixed.
@@ -55,6 +57,12 @@
 		form_autocomplete: 'off',		// when 'off' default browser autocomplete will be switched off 
 		tag: 'p',						// the html tag that will be used to display errors
 		lost_focus: true,				// when true, validation will be applied when field loose focus.
+
+        // highlight settings
+        highlight: {                    // object/ null. when null do not highlight.
+            marker: '*',                // the flag marker
+            position: 'post'            // pre or post. where the marker will be placed.
+        },
 		
 		// default messages
 		messages: {
@@ -68,9 +76,10 @@
 			textarea_help: 'Typed <span class="at-counter">{0}</span> of {1}'
 		},
 		
-		// filters & callbacks
+		// filters
 		use_filter: true,		// defines that filters will be validated
 		
+        // callbacks
 		before_validate: null,	// callback which runs before default validation
 		after_validate: null	// callback which runs after default validation
 		
@@ -183,6 +192,19 @@
 						return;
 						
 					} // ignore
+                    
+                    // place the highlight marker
+                    if ( el.is('[required]') && o.highlight !== null && o.highlight !== false )
+                    {
+                       
+                        $('[for=' + el.attr('id') + ']').html(
+                            ( o.highlight.position == 'pre' ? 
+                                '<span class="at-required-highlight" >' + o.highlight.marker + '</span>&nbsp;' + $('[for=' + el.attr('id') + ']').html() :
+                                $('[for=' + el.attr('id') + ']').html() + '&nbsp;<span class="at-required-highlight" >' + o.highlight.marker + '</span>'
+                            )
+                        );
+                        
+                    }
 
 					// set a handler for 'lost focus'
 					if (o.lost_focus)
