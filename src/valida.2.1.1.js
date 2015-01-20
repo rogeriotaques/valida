@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * @requires jQuery v1.9 or above
- * @version 2.1.0
+ * @version 2.1.1
  * @cat Plugins/Form Validation
  * @author Rogério Taques (rogerio.taques@gmail.com)
  * @see https://github.com/rogeriotaques/valida
@@ -34,6 +34,8 @@
  * CHANGELOG
  * 
  * 2.1  Added the cappability of highlight required fields.
+ *      Scrolling animation till the first field with error or invalid.
+ *      Minor bugs from v.2.1.0 were fixed.
  *
  * 2.0 	First release. Entirely rewritten to become lighweight and to provide support for bootstrap.
  * 		Some improvements in filters (url and phone_br) and callbacks (after and before validations). Special thanks for Kosuke Hiraga. 
@@ -47,7 +49,7 @@
 
 	"use strict";
 	
-	var version = '2.0.9',
+	var version = '2.1.1',
 	
 	// default options
 	defaults = {
@@ -204,7 +206,7 @@
                             )
                         );
                         
-                    }
+                    } // el.is('[required]') && o.highlight !== null && o.highlight !== false
 
 					// set a handler for 'lost focus'
 					if (o.lost_focus)
@@ -354,6 +356,16 @@
 								el.html(el.data('old-value'));
 							}
 						});
+                        
+                        // calc the middle position on window
+                        var wmid = Math.ceil($(window).height() / 2);
+                        
+                        // let's meet the first field with error ...
+                        $('html,body').animate({
+                            'scrollTop': $('.at-required:visible, .at-invalid:visible').filter(':first').offset().top - wmid 
+                        }, 'fast', function(ev) { 
+                            $('.at-required:visible, .at-invalid:visible').filter(':first').focus();
+                        });
 						
 						return false;
 						
@@ -401,7 +413,22 @@
         partial: function( el, show_error, force_clear )
         {
             
-            return _partial_validation( el, show_error, force_clear );
+            var err = _partial_validation( el, show_error, force_clear );
+
+            if (err)
+            {
+                // calc the middle position on window
+                var wmid = Math.ceil($(window).height() / 2);
+
+                // let's meet the first field with error ...
+                $('html,body').animate({
+                    'scrollTop': $('.at-required:visible, .at-invalid:visible').filter(':first').offset().top - wmid 
+                }, 'fast', function(ev) { 
+                    $('.at-required:visible, .at-invalid:visible').filter(':first').focus();
+                });
+            }
+            
+            return err;
             
         } // partial
 		
@@ -443,7 +470,7 @@
 
         } // ignore
 
-        if ( el.is('[required]') && ( ( !el.is('[type=checkbox]') && el.val() == '' ) || (el.is('[type=checkbox]') && !el.is(':checked')) || (el.is('select') && !el.find('option').length) ) )
+        if ( el.is('[required]') && ( ( !el.is('[type=checkbox]') && el.val() == '' ) || (el.is('[type=checkbox]') && !el.is(':checked')) || (el.is('select') && !el.find('option:selected').length) ) )
         {
 
             err = true;
@@ -626,7 +653,8 @@
 		}
 		else
 		{
-			el.parent('label').after( $('<span />', {'class': 'at-error', 'html': msg}) );
+            el.parent().find('.at-error,.at-warning,.at-info,.at-success').remove();
+			el.next('label').after( $('<span />', {'class': 'at-error', 'html': '&nbsp;' + msg}) );
 		}
 		
 	} // show_error
@@ -636,9 +664,9 @@
 	 */
 	function _clear( el ) 
 	{
-		el.removeClass('at-required at-invalid');
+		el.removeClass('at-required at-invalid at-success');
 		
-		// clear errors|warnings messages of given element
+		// clear success|errors|warnings messages of given element
 		if (! el.is('[type=checkbox]'))
 		{
 			// clear for input-groups as well.
@@ -648,11 +676,11 @@
 			}
 			
 			el.closest('.form-group').removeClass('has-error has-warning has-success has-feedback');
-			el.siblings('.form-control-feedback, .at-error, .at-warning, .at-info').remove();
+			el.siblings('.form-control-feedback, .at-error, .at-warning, .at-info, .at-success').remove();
 		}
 		else
 		{
-			el.parent('label').siblings('.form-control-feedback, .at-error, .at-warning, .at-info').remove();
+			el.siblings('.form-control-feedback, .at-error, .at-warning, .at-info, .at-success').remove();
 		}
 		
 	}; // _clear
@@ -662,9 +690,9 @@
 	 */
 	function _clear_all() 
 	{
-		// clear all errors|warnings messages
+		// clear all success|errors|warnings messages
 		$('.at-error, .at-warning, .at-info, .form-control-feedback').remove();
-		$('.at-required, .at-invalid, .has-error, .has-warning, .has-feedback, .has-success').removeClass('at-required at-invalid has-error has-warning has-feedback has-sucess');
+		$('.at-required, .at-invalid, .at-success, .has-error, .has-warning, .has-feedback, .has-success').removeClass('at-required at-invalid at-success has-error has-warning has-feedback has-success');
 		
 	}; // _clear
 	
