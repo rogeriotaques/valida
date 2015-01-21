@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * @requires jQuery v1.9 or above
- * @version 2.1.1
+ * @version 2.1.2
  * @cat Plugins/Form Validation
  * @author Rogério Taques (rogerio.taques@gmail.com)
  * @see https://github.com/rogeriotaques/valida
@@ -35,7 +35,7 @@
  * 
  * 2.1  Added the cappability of highlight required fields.
  *      Scrolling animation till the first field with error or invalid.
- *      Minor bugs from v.2.1.0 were fixed.
+ *      Minor bugs fixes.
  *
  * 2.0 	First release. Entirely rewritten to become lighweight and to provide support for bootstrap.
  * 		Some improvements in filters (url and phone_br) and callbacks (after and before validations). Special thanks for Kosuke Hiraga. 
@@ -49,7 +49,7 @@
 
 	"use strict";
 	
-	var version = '2.1.1',
+	var version = '2.1.2',
 	
 	// default options
 	defaults = {
@@ -119,10 +119,16 @@
 		// Functional Filters
 		'min_length' : function(s, l) { return (s.length >= l); },
 		'max_length' : function(s, l) { return (s.length <= l); },
+        
 		'matches' : function(a, b) { 
-			b = ( $('#'+b).val() || b );
+            
+            try {
+                b = ( $('#'+b).val() || b );
+            } catch(e) {}
+            
 			return (a == b); 
 		},
+        
 		'greater_than' : function(v, r) {
 			if ( !v.match(filters['number']) || !r.match(filters['number']) ) return false;
 			return (parseInt(v, 10) > parseInt(r, 10)); 
@@ -549,18 +555,18 @@
 			pattern = /^(\w\d)+/, 
 			error   = false;
 		
-		for(var i=0; i < list.length; i++) 
+		for(var i=0 in list) 
 		{
 			// get given filter
 			pattern = list[i];
-			
-			if (pattern !== undefined && pattern.indexOf(':') !== -1) 
+            
+			if (typeof pattern != 'undefined' && pattern.indexOf(':') !== -1) 
 			{
 				// if it's a functional filter 
 				// split the function name and given value
 				
 				pattern = list[i].split(':');
-				error 	= ( el.val() !== '' && !( filters[pattern[0]] && filters[pattern[0]](el.val(), (el.parents('form').find('#'+pattern[1]).val() || pattern[1]) )) );
+				error 	= ( el.val() !== '' && !( typeof filters[pattern[0]] != 'undefined' && filters[pattern[0]](el.val(), (el.parents('form').find('#'+pattern[1]).val() || pattern[1]) )) );
 				if (error) break;
 				
 			} 
@@ -570,7 +576,7 @@
 				// if it isn't a functional filter
 				// retrieve the patthern to be matched
 				
-				pattern = (filters[el.attr('filter')] || pattern); 
+				pattern = filters[pattern]; 
 				error 	= (el.val() !== '' && !el.val().match(pattern)); 
 				if (error) break;
 				

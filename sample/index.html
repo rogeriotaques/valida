@@ -121,9 +121,10 @@
 					<input type="text" name="field-1" id="field-1" required="true" class="form-control" />
 				</div>
 			
-				<label for="field-1-2" >Field 1.2: (not required, filter: email)</label>
+				<label for="field-1-2" >Field 1.2: (not required, filter: date)</label>
 				<div class="form-group" >
-					<input type="text" name="field-1-2" id="field-1-2" filter="email" class="form-control" />
+					<input type="text" name="field-1-2" id="field-1-2" filter="date" class="form-control"
+						data-invalid="Given value must be a valid date formated as 0000-00-00"  />
 				</div>
 			
 				<label for="field-1-3" >Field 1.3: (required, filter: greater_than:10|less_than:15)</label>
@@ -132,6 +133,30 @@
 						required="true" filter="greater_than:10|less_than:15" class="form-control"
 						data-required="Given value must be between 10 and 15" />
 				</div>
+                
+                <div class="row" >
+                
+                    <div class="col-xs-12 col-sm-5" >
+
+                        <label for="field-1-2" >Field 1.4.1: (required, filter: email)</label>
+                        <div class="form-group" >
+                            <input type="text" name="field-1-4-1" id="field-1-4-1" filter="email" class="form-control" required="true"
+                                data-invalid="Must be a valid email address"  />
+                        </div>
+                        
+                    </div>
+                
+                    <div class="col-xs-12 col-sm-7" >
+
+                        <label for="field-1-2" >Field 1.4.2: (required, filter: email|matches:field-1-4-1)</label>
+                        <div class="form-group" >
+                            <input type="text" name="field-1-4-2" id="field-1-4-2" filter="email|matches:field-1-4-1" class="form-control" required="true"
+                                data-invalid="Must be a valid email address and match field 1.4.1's value"  />
+                        </div>
+                        
+                    </div>
+                    
+                </div>
 				
 				<hr >
 			
@@ -227,7 +252,7 @@
         </script>
 		
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script type="text/javascript" src="../src/valida.2.1.1.min.js"></script>
+		<script type="text/javascript" src="../src/valida.2.1.2.js"></script>
 		<script type="text/javascript" >
 			
 			

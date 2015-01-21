@@ -1,13 +1,14 @@
-# jQuery Valida 2.1.1
+# jQuery Valida 2.1.2
 
 Valida is a jQuery plugin which provides an easy, fast and lightweight way to make form validations on client-side. 
 It's source-code (minified) has about *12Kb*.
 
 [Live Demo](http://awin.com.br/valida)
 
-## What's new in 2.1.1?
+## What's new in 2.1.2?
 
     * A "flag" mark that highlights required form fields.
+    * Fixed bug for multiple filters.
 
 [Live Demo](http://awin.com.br/valida/)
 
@@ -40,7 +41,7 @@ and the layout of messages displayed!
 Import the "valida.js" on the HEAD of your page:
 
 ```
-<script type="text/javascript" src="valida.2.1.1.min.js" ></script>
+<script type="text/javascript" src="valida.js" ></script>
 ```
 
 Set what kind of fields are required and has filters:
@@ -54,7 +55,8 @@ Set what kind of fields are required and has filters:
 Then, you just need call it:
 
 ```
-<script type="text/javascript" src="valida.2.0.7.js" >
+<script type="text/javascript" src="valida.js" ></script>
+<script type="text/javascript" >
     jQuery(document).ready(function(){
        $('your-form').valida();
     });
@@ -74,3 +76,5 @@ Well, that's it! Easy, don't you?
 If you have any suggestion, critics or just wanna say hello, feel free to mail me or leave a comments here.
 
 Happy coding! =)
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/rogeriotaques/valida/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
