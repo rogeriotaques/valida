@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * @requires jQuery v1.9 or above
- * @version 2.1.2
+ * @version 2.1.3
  * @cat Plugins/Form Validation
  * @author Rogério Taques (rogerio.taques@gmail.com)
  * @see https://github.com/rogeriotaques/valida
@@ -49,7 +49,7 @@
 
 	"use strict";
 	
-	var version = '2.1.2',
+	var version = '2.1.3',
 	
 	// default options
 	defaults = {
@@ -366,14 +366,19 @@
                         // calc the middle position on window
                         var wmid = Math.ceil($(window).height() / 2);
                         
-                        // let's meet the first field with error ...
-                        $('html,body').animate({
-                            'scrollTop': $('.at-required:visible, .at-invalid:visible').filter(':first').offset().top - wmid 
-                        }, 'fast', function(ev) { 
-                            $('.at-required:visible, .at-invalid:visible').filter(':first').focus();
-                        });
-						
-						return false;
+                        if ( $('.at-required:visible, .at-invalid:visible').length > 0 )
+                        {
+                            
+                            // let's meet the first field with error ...
+                            $('html,body').animate({
+                                'scrollTop': $('.at-required:visible, .at-invalid:visible').filter(':first').offset().top - wmid 
+                            }, 'fast', function(ev) { 
+                                $('.at-required:visible, .at-invalid:visible').filter(':first').focus();
+                            });
+                            
+                        }
+
+                        return false;
 						
 					} // err
 					
@@ -426,12 +431,17 @@
                 // calc the middle position on window
                 var wmid = Math.ceil($(window).height() / 2);
 
-                // let's meet the first field with error ...
-                $('html,body').animate({
-                    'scrollTop': $('.at-required:visible, .at-invalid:visible').filter(':first').offset().top - wmid 
-                }, 'fast', function(ev) { 
-                    $('.at-required:visible, .at-invalid:visible').filter(':first').focus();
-                });
+                if ( $('.at-required:visible, .at-invalid:visible').length > 1 )
+            	{
+                
+	                // let's meet the first field with error ...
+	                $('html,body').animate({
+	                    'scrollTop': $('.at-required:visible, .at-invalid:visible').filter(':first').offset().top - wmid 
+	                }, 'fast', function(ev) { 
+	                    $('.at-required:visible, .at-invalid:visible').filter(':first').focus();
+	                });
+	                
+            	}
             }
             
             return err;
