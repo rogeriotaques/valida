@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * @requires jQuery v1.9 or above
- * @version 2.1.3
+ * @version 2.1.4
  * @cat Plugins/Form Validation
  * @author Rogério Taques (rogerio.taques@gmail.com)
  * @see https://github.com/rogeriotaques/valida
@@ -36,6 +36,7 @@
  * 2.1  Added the cappability of highlight required fields.
  *      Scrolling animation till the first field with error or invalid.
  *      Minor bugs fixes.
+ *      Fixed a bug of initialiser syntaxes within numeration in strict mode. (A special thanks to Fernando Goya).
  *
  * 2.0 	First release. Entirely rewritten to become lighweight and to provide support for bootstrap.
  * 		Some improvements in filters (url and phone_br) and callbacks (after and before validations). Special thanks for Kosuke Hiraga. 
@@ -563,9 +564,10 @@
 	{
 		var list	= el.attr('filter') !== undefined && el.attr('filter').indexOf('|') !== -1 ? el.attr('filter').split('|') : [el.attr('filter')],
 			pattern = /^(\w\d)+/, 
-			error   = false;
+			error   = false,
+            i = 0;
 		
-		for(var i=0 in list) 
+		for(i in list) 
 		{
 			// get given filter
 			pattern = list[i];
