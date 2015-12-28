@@ -36,6 +36,7 @@
  * 2.1  Added the cappability of highlight required fields.
  *      Scrolling animation till the first field with error or invalid.
  *      Minor bugs fixes.
+ *      Fixed a bug of initialiser syntaxes within numeration in strict mode. (A special thanks to Fernando Goya).
  *
  * 2.0 	First release. Entirely rewritten to become lighweight and to provide support for bootstrap.
  * 		Some improvements in filters (url and phone_br) and callbacks (after and before validations). Special thanks for Kosuke Hiraga.
