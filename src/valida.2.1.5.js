@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * @requires jQuery v1.9 or above
- * @version 2.1.4
+ * @version 2.1.5
  * @cat Plugins/Form Validation
  * @author Rogério Taques (rogerio.taques@gmail.com)
  * @see https://github.com/rogeriotaques/valida
@@ -37,6 +37,7 @@
  *      Scrolling animation till the first field with error or invalid.
  *      Minor bugs fixes.
  *      Fixed a bug of initialiser syntaxes within numeration in strict mode. (A special thanks to Fernando Goya).
+ *      Fixed a bug on regular expression to make allowed address with longer top level domains, such as: something.careers, something.website, etc.
  *
  * 2.0 	First release. Entirely rewritten to become lighweight and to provide support for bootstrap.
  * 		Some improvements in filters (url and phone_br) and callbacks (after and before validations). Special thanks for Kosuke Hiraga.
@@ -50,7 +51,7 @@
 
 	"use strict";
 
-	var version = '2.1.4',
+	var version = '2.1.5',
 
 	// default options
 	defaults = {
@@ -91,9 +92,9 @@
 	// available filters
 	filters = {
 		// name@domain.co[m[.br]]
-		'email' : /^[\w!#$%&'*+\/=?^`{|}~-]+(\.[\w!#$%&'*+\/=?^`{|}~-]+)*@(([\w-]+\.)+[A-Za-z]{2,6}|\[\d{1,3}(\.\d{1,3}){3}\])$/,
+		'email' : /^[\w!#$%&'*+\/=?^`{|}~-]+(\.[\w!#$%&'*+\/=?^`{|}~-]+)*@(([\w-]+\.)+[A-Za-z]{2,}|\[\d{1,3}(\.\d{1,3}){3}\])$/,
 		// [http[s]://][www.]domain.co[m[.br]]
-		'url' : /^(http[s]?:\/\/|ftp:\/\/)?(www\.)?[a-zA-Z0-9-\.]+\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br|jp|co|in|me|la|ly)$/,
+		'url' : /^(http[s]?:\/\/|ftp:\/\/)?(www\.)?(([\w-]+\.)+[A-Za-z]{2,}|\[\d{1,3}(\.\d{1,3}){3}\])$/,
 		// 01234567
 		'number' : /^([0-9])+$/,
 		// [[0,]00]0.00 or [[0.]00]0,00 or 0000.00 or 0000,00 or 0
