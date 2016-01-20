@@ -1,4 +1,4 @@
-# jQuery Valida 2.1.5
+# jQuery Valida 2.1.6
 
 Valida is a jQuery plugin which provides an easy, fast and lightweight way to make form validations on client-side.
 It's source-code (minified) has about *12Kb*.

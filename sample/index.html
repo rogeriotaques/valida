@@ -280,7 +280,7 @@
 		</div>
 
 		<div class="footer" >
-			<p >&copy;2014, Rogério Taques.</p>
+			<p >&copy;2016, Rogério Taques.</p>
 		</div>
 
     <script>
@@ -296,9 +296,8 @@
     </script>
 
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script type="text/javascript" src="../src/valida.2.1.4.min.js"></script>
+		<script type="text/javascript" src="../src/valida.2.1.6.min.js"></script>
 		<script type="text/javascript" >
-
 
 			$(document).ready(function() {
 
@@ -327,19 +326,25 @@
 
 					// filters & callbacks
 					use_filter: true,
+
+					// a callback function that will be called right before valida runs.
+					// it must return a boolan value (true for good results and false for errors)
 					before_validate: null,
+
+					// a callback function that will be called right after valida runs.
+					// it must return a boolan value (true for good results and false for errors)
 					after_validate: null
 
 				});
 				*/
 
-                // setup the partial validation
-                $('#partial-1').on('click', function( ev ) {
-                    ev.preventDefault();
-                    $('#res-1').click(); // clear form error msgs
-                    $('form').valida('partial', '#field-1'); // validate only field-1
-                    $('form').valida('partial', '#field-1-3'); // validate only field-1-3
-                });
+        // setup the partial validation
+				$('#partial-1').on('click', function( ev ) {
+					ev.preventDefault();
+					$('#res-1').click(); // clear form error msgs
+					$('form').valida('partial', '#field-1'); // validate only field-1
+					$('form').valida('partial', '#field-1-3'); // validate only field-1-3
+				});
 
 			});
 
