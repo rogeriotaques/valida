@@ -152,29 +152,44 @@
 						data-required="Given value must be between 10 and 15" />
 				</div>
 
-                <div class="row" >
 
-                    <div class="col-xs-12 col-sm-5" >
+				<label for="field-1-4" >Field 1.4: (required, filter: cpf)</label>
+				<div class="form-group" >
+					<input type="text" name="field-1-4" id="field-1-4" maxlength="14"
+						required="true" filter="cpf:field-1-4" class="form-control"
+						data-invalid="Given value must be a valid CPF." />
+				</div>
 
-                        <label for="field-1-2" >Field 1.4.1: (required, filter: email)</label>
-                        <div class="form-group" >
-                            <input type="text" name="field-1-4-1" id="field-1-4-1" filter="email" class="form-control" required="true"
-                                data-invalid="Must be a valid email address"  />
-                        </div>
+				<label for="field-1-5" >Field 1.5: (required, filter: cnpj)</label>
+				<div class="form-group" >
+					<input type="text" name="field-1-5" id="field-1-5" maxlength="18"
+						required="true" filter="cnpj:field-1-5" class="form-control"
+						data-invalid="Given value must be a valid CNPJ." />
+				</div>
 
-                    </div>
+				<div class="row" >
 
-                    <div class="col-xs-12 col-sm-7" >
+						<div class="col-xs-12 col-sm-5" >
 
-                        <label for="field-1-2" >Field 1.4.2: (required, filter: email|matches:field-1-4-1)</label>
-                        <div class="form-group" >
-                            <input type="text" name="field-1-4-2" id="field-1-4-2" filter="email|matches:field-1-4-1" class="form-control" required="true"
-                                data-invalid="Must be a valid email address and match field 1.4.1's value"  />
-                        </div>
+								<label for="field-1-2" >Field 1.4.1: (required, filter: email)</label>
+								<div class="form-group" >
+										<input type="text" name="field-1-4-1" id="field-1-4-1" filter="email" class="form-control" required="true"
+												data-invalid="Must be a valid email address"  />
+								</div>
 
-                    </div>
+						</div>
 
-                </div>
+						<div class="col-xs-12 col-sm-7" >
+
+								<label for="field-1-2" >Field 1.4.2: (required, filter: email|matches:field-1-4-1)</label>
+								<div class="form-group" >
+										<input type="text" name="field-1-4-2" id="field-1-4-2" filter="email|matches:field-1-4-1" class="form-control" required="true"
+												data-invalid="Must be a valid email address and match field 1.4.1's value"  />
+								</div>
+
+						</div>
+
+				</div>
 
 				<hr >
 
@@ -296,7 +311,7 @@
     </script>
 
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script type="text/javascript" src="../src/valida.2.1.6.min.js"></script>
+		<script type="text/javascript" src="../src/valida.2.1.7.js"></script>
 		<script type="text/javascript" >
 
 			$(document).ready(function() {
