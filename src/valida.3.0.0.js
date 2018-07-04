@@ -721,7 +721,7 @@
           }
 
           // When element has a obvious filter type
-          if ($.inArray(elem.attr('type'), ['email', 'url', 'number'])) {
+          if ($.inArray(elem.attr('type'), ['email', 'url', 'number']) !== -1) {
             elem.attr('data-filter', elem.attr('type'));
           }
 
