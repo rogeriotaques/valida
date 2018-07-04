@@ -14,7 +14,7 @@ var named = require('vinyl-named');
 // ~~ VARS ~~
 
 var FILE_PATH = {
-  DIST: './src',
+  DIST: './dist',
   SRC: './src'
 };
 
