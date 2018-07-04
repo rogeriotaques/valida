@@ -105,7 +105,6 @@
       }
 
       let i;
-      let dv;
       let d1;
 
       let raw = n.replace(/[^0-9]/g, '');
@@ -124,7 +123,7 @@
       }
 
       // split necessary values for validation
-      dv = raw.substr(9, 2);
+      const dv = raw.substr(9, 2);
       raw = raw.substr(0, 9);
       d1 = 0;
 
@@ -177,22 +176,30 @@
     },
 
     cnpj: (n) => {
-      var patt = /\d{1,2}.\d{3}.\d{3}\/\d{4}-\d{2}/;
+      const patt = /^\d{1,2}.?\d{3}.?\d{3}\/?\d{4}-?\d{2}$/;
 
       // is given id matching the expected pattern
       if (!patt.test(n)) {
         return false;
       }
 
-      var i, raw, dv, sum, res, pos, size, original, same;
+      let i;
+      let raw;
+      let dv;
+      let sum;
+      let res;
+      let pos;
+      let size;
+      let original;
+      let same;
 
       // get raw number (without separators)
-      raw = n.replace(/(\.|\/|\-)/g, '');
+      raw = n.replace(/[^0-9]/g, '');
       same = true;
 
       // a valid id can't contain same number for each position
-      for (i = 0; i < raw.length - 1; i++) {
-        if (raw.charAt(i) != raw.charAt(i + 1)) {
+      for (i = 0; i < raw.length - 1; i += 1) {
+        if (raw.charAt(i) !== raw.charAt(i + 1)) {
           same = false;
           break;
         }
@@ -203,15 +210,18 @@
       }
 
       // gather splitted values
+      /* eslint-disable */
       original = raw;
       size = raw.length - 2;
       dv = raw.substr(size, 2);
       raw = raw.substr(0, size);
       sum = 0;
       pos = size - 7;
+      /* eslint-enable */
 
       // calculate first verification digit
-      for (i = size; i >= 1; i--) {
+      for (i = size; i >= 1; i -= 1) {
+        // eslint-disable-next-line no-plusplus
         sum += raw.charAt(size - i) * pos--;
 
         if (pos < 2) {
@@ -223,18 +233,19 @@
       res = sum % 11 < 2 ? 0 : 11 - (sum % 11);
 
       // is given first dv valid?
-      if (res != dv.charAt(0)) {
+      if (res.toString() !== dv.charAt(0)) {
         return false;
       }
 
       // gather updated splitted values
-      size = size + 1;
+      size += 1;
       raw = original.substr(0, size);
       sum = 0;
       pos = size - 7;
 
       // calculate second digit
-      for (i = size; i >= 1; i--) {
+      for (i = size; i >= 1; i -= 1) {
+        // eslint-disable-next-line no-plusplus
         sum += raw.charAt(size - i) * pos--;
 
         if (pos < 2) {
@@ -246,7 +257,7 @@
       res = sum % 11 < 2 ? 0 : 11 - (sum % 11);
 
       // is given second dv valid?
-      if (res != dv.charAt(1)) {
+      if (res.toString() !== dv.charAt(1)) {
         return false;
       }
 
