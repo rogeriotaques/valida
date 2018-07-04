@@ -266,6 +266,13 @@
     }
   }; // filters
 
+  const masks = {
+    date: 'XXXX-XX-XX',
+    postalcode: 'XXX-XXXX',
+    cpf: 'XXX.XXX.XXX-XX',
+    cnpj: 'XX.XXX.XXX/XXXX-XX'
+  };
+
   const methods = {
     init: function init(options = {}) {
       let f; // The form instance
@@ -281,6 +288,28 @@
       ];
 
       const elementsToRemove = ['.at-error', '.at-warning', '.at-info'];
+
+      const applyMask = (event) => {
+        const elem = $(event.currentTarget);
+
+        const mask =
+          masks[elem.attr('data-mask') || elem.attr('mask')] ||
+          (elem.attr('data-mask') || elem.attr('mask')) ||
+          '';
+
+        const s = elem.val().replace(/[^a-zA-Z0-9]/g, '');
+
+        let r = '';
+
+        for (let im = 0, is = 0; im < mask.length && is < s.length; im += 1) {
+          // eslint-disable-next-line no-plusplus
+          r += mask.charAt(im) === 'X' ? s.charAt(is++) : mask.charAt(im);
+        }
+
+        elem.val(r);
+
+        return r;
+      };
 
       /**
        * Remove validation error messages
@@ -498,12 +527,7 @@
        * @return boolean
        */
       const isSelectValid = function isv(elem) {
-        return (
-          elem
-            .find('option')
-            .filter(':selected')
-            .val() === '' || !elem.find('option').length
-        );
+        return elem.find('option').length === 0 || elem.val() === '';
       }; // isSelectValid
 
       /**
@@ -606,7 +630,7 @@
 
         if (el.is('[required]')) {
           if (
-            (el.is('select') && !isSelectValid(el)) ||
+            (el.is('select') && isSelectValid(el)) ||
             (el.attr('type') === 'checkbox' && !el.is(':checked')) ||
             el.val() === ''
           ) {
@@ -697,7 +721,7 @@
           }
 
           // When element has a obvious filter type
-          if (elem.attr('type') === 'email') {
+          if ($.inArray(elem.attr('type'), ['email', 'url', 'number'])) {
             elem.attr('data-filter', elem.attr('type'));
           }
 
@@ -763,6 +787,21 @@
                   .find('.at-description > .at-counter')
                   .html(elem.val().length);
               });
+          }
+
+          // When element should use mask
+          if (elem.attr('data-mask') || elem.attr('mask')) {
+            // Apply the mask while typing
+            elem.on('keyup.valida keydown.valida', applyMask);
+
+            // Make sure the field maxlength matches the mask length
+            elem.attr(
+              'maxlength',
+              (
+                masks[elem.attr('data-mask') || elem.attr('mask')] ||
+                (elem.attr('data-mask') || elem.attr('mask'))
+              ).length
+            );
           }
 
           // When the value changes in a validatable element
