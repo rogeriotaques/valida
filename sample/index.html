@@ -13,40 +13,84 @@
   <form method="GET" action="" id="sample-form-1">
     <p>Form #1</p>
 
-    <label for="one">One</label>
-    <input type="text" id="one" name="one" required>
+    <label for="one">Text</label>
+    <input type="text" id="one" name="one" required data-required="One is required">
 
     <br>
 
-    <label for="two">Two</label>
-    <input type="tel" id="two" name="two">
-
-    <br>
-
-    <input type="checkbox" id="three" name="three" value="1" required>
-    <label for="three">Three</label>
-
-    <div>
-      <br>
-      <button type="submit">Submit</button>
-    </div>
-  </form>
-
-  <form method="GET" action="" id="sample-form-2">
-    <p>Form #2</p>
-
-    <label for="one">One</label>
-    <input type="email" id="one" name="one" required>
-
-    <br>
-
-    <label for="two">Two</label>
+    <label for="two">Text</label>
     <input type="text" id="two" name="two">
 
     <br>
 
-    <label for="three">Three</label>
-    <textarea id="three" maxlength="10"></textarea>
+    <label for="three">Email</label>
+    <input type="email" id="three" name="three" data-invalid="Email should follow the name@domain.tld format" required>
+
+    <br>
+
+    <label for="four">URL</label>
+    <input type="url" id="four" name="four" required>
+
+    <br>
+
+    <label for="five">Select</label>
+    <select id="five" required>
+      <option value=""></option>
+      <option value="a">A</option>
+      <option value="b">B</option>
+    </select>
+
+    <br>
+
+    <input type="checkbox" id="six_a" name="six_a" value="1" required>
+    <label for="six_a">Checkbox</label>
+
+    <br>
+
+    <input type="checkbox" id="six_b" name="six_b" value="1">
+    <label for="six_b">Checkbox</label>
+
+    <br>
+
+    <label for="seven">Radio</label>
+    <input type="radio" id="seven-1" name="seven" value="1">
+    <input type="radio" id="seven-2" name="seven" value="2">
+
+    <br>
+
+    <label for="eight">Textarea</label>
+    <br>
+    <textarea id="eight" required maxlength="10"></textarea>
+
+    <br>
+
+    <label for="nine">Greater than 10</label>
+    <input type="text" id="nine" name="nine" data-filter="greater_than:10">
+
+    <br>
+
+    <label for="ten">Matches previous</label>
+    <input type="text" id="ten" name="ten" data-filter="matches:nine">
+
+    <br>
+
+    <label for="eleven">Less than 10</label>
+    <input type="text" id="eleven" name="eleven" data-filter="less_than:10">
+
+    <br>
+
+    <label for="twelve">Min length of 2 and max length of 5.</label>
+    <input type="text" id="twelve" name="twelve" required data-filter="max_length:5|min_length:2">
+
+    <br>
+
+    <label for="thirteen">CPF</label>
+    <input type="text" id="thirteen" name="thirteen" required data-filter="cpf">
+
+    <br>
+
+    <label for="fourteen">CNPJ</label>
+    <input type="text" id="fourteen" name="fourteen" required data-filter="cnpj">
 
     <div>
       <br>
@@ -61,15 +105,7 @@
   <script type="text/javascript">
     (function () {
       $('#sample-form-1').valida({
-        debug: true,
-        highlightPosition: 'pre',
-        highlightOptional: false,
-        highlightMarker: '( Required )',
-        afterValidation: function a() { console.log('A'); }
-      });
-
-      $('#sample-form-2').valida({
-        afterValidation: function b() { console.log('B'); }
+        // debug: true
       });
     })();
   </script>
