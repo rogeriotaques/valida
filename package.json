@@ -1,0 +1,39 @@
+{
+  "name": "valida",
+  "version": "3.0.0",
+  "description": "A client-side form validator for jQuery.",
+  "main": "./src/valida.js",
+  "scripts": {
+    "start": "gulp",
+    "build": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rogeriotaques/valida.git"
+  },
+  "keywords": [
+    "jquery",
+    "client-side",
+    "form",
+    "validation",
+    "plugin"
+  ],
+  "author": "Rogerio Taques",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rogeriotaques/valida/issues"
+  },
+  "homepage": "https://github.com/rogeriotaques/valida#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "browser-sync": "^2.24.5",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^4.0.2",
+    "gulp-minify": "^3.1.0",
+    "vinyl-named": "^1.1.0"
+  }
+}
