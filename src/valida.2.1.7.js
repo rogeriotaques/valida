@@ -1,4 +1,4 @@
-/**
+/**!
 	* Valida - jQuery plugin to validate forms in a as simple as possible way.
 	* Copyright (c) 2011-2013, Rogério Taques.
 	*
@@ -21,7 +21,7 @@
 	* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	*
 	* @requires jQuery v1.9 or above
-	* @version 2.1.6
+	* @version 2.1.7
 	* @cat Plugins/Form Validation
 	* @author Rogério Taques (rogerio.taques@gmail.com)
 	* @see https://github.com/rogeriotaques/valida
@@ -38,6 +38,8 @@
 	*      Minor bugs fixes.
 	*      Fixed a bug of initialiser syntaxes within numeration in strict mode. (A special thanks to Fernando Goya).
 	*      Fixed a bug on regular expression to make allowed address with longer top level domains, such as: something.careers, something.website, etc.
+	*			 Added a filter for CPF validation (a brazilian nationwide people registration ID)
+	*			 Added a filter for CNPJ validation (a brazilian nationwide enterprise registration ID)
 	*
 	* 2.0 First release. Entirely rewritten to become lighweight and to provide support for bootstrap.
 	* 		Some improvements in filters (url and phone_br) and callbacks (after and before validations). Special thanks for Kosuke Hiraga.
@@ -51,7 +53,7 @@
 
 	"use strict";
 
-	var version = '2.1.6',
+	var version = '2.1.7',
 
 	// default options
 	defaults = {
@@ -121,6 +123,162 @@
 		// Functional Filters
 		'min_length' : function(s, l) { return (s.length >= l); },
 		'max_length' : function(s, l) { return (s.length <= l); },
+
+		'cpf' : function ( n ) {
+			var patt = /\d{3}.\d{3}.\d{3}-\d{2}/;
+
+			// given number doesn't matches the expected pattern 
+			if (!patt.test(n)) {
+				return false;
+			}
+
+			var i, raw, dv, d1, same;
+
+			raw  = n.replace(/(\.|\-)/g, '');
+			same = true;
+
+			// a valid id can't contain same number for each position
+			for (i = 0; i < raw.length - 1; i++) {
+				if (raw.charAt(i) != raw.charAt(i + 1)) {
+					same = false;
+					break;
+				}
+			}
+
+			if (same) {
+				return false;
+			}
+
+			// split necessary values for validation 
+			dv  = raw.substr(9,2);
+			raw = raw.substr(0,9);
+			d1  = 0;
+
+			// calculate the first verification digit
+			for (i = 0; i < 9; i++) {
+				d1 += raw.charAt(i)*(10-i);
+			}
+
+			// first digit can't be zero
+			if (d1 == 0) {
+				return false;
+			}
+
+			// get mode of dv
+			d1 = 11 - (d1 % 11);
+
+			// whenever it's bigger than 9, should becomes 0
+			if (d1 > 9) {
+				d1 = 0;
+			}
+
+			// is given dv valid?
+			if (dv.charAt(0) != d1) {
+				return false;
+			}
+	
+			// second dv is double of first 
+			d1 *= 2;
+
+			// calculates its ratio 
+			for (i = 0; i < 9; i++) {
+				d1 += raw.charAt(i)*(11-i);
+			}
+
+			// get second db mode 
+			d1 = 11 - (d1 % 11);
+
+			// whenever second dv is bigger than 9, should become 0
+			if (d1 > 9) {
+				d1 = 0;
+			}
+			
+			// is second dv valid?
+			if (dv.charAt(1) != d1) {
+				return false;
+			}
+			
+			// wow, given id is valid.
+			return true;
+		},
+
+		'cnpj' : function ( n ) {
+			var patt = /\d{1,2}.\d{3}.\d{3}\/\d{4}-\d{2}/;
+
+			// is given id matching the expected pattern
+			if (!patt.test(n)) {
+				return false;
+			}
+
+			var i, raw, dv, sum, res, pos, size, original, same;
+
+			// get raw number (without separators)
+			raw = n.replace(/(\.|\/|\-)/g, '');
+			same = true;
+
+			// a valid id can't contain same number for each position
+			for (i = 0; i < raw.length - 1; i++) {
+				if (raw.charAt(i) != raw.charAt(i + 1)) {
+					same = false;
+					break;
+				}
+			}
+
+			if (same) {
+				return false;
+			}
+
+			// gather splitted values 
+			original = raw;
+			size = raw.length - 2;
+			dv   = raw.substr(size, 2);
+			raw  = raw.substr(0, size);
+			sum  = 0;
+			pos  = size - 7; 
+
+			// calculate first verification digit 
+			for (i = size; i >= 1; i--) {
+				sum += raw.charAt(size - i) * pos--;
+				
+				if (pos < 2) {
+					pos = 9;
+				}
+			}
+
+			// get dv mod 
+			res = sum % 11 < 2 ? 0 : 11 - sum % 11;
+
+			// is given first dv valid?
+			if (res != dv.charAt(0)) {
+				return false;
+			}
+
+			// gather updated splitted values 
+			size = size + 1;
+			raw  = original.substr(0, size);
+			sum  = 0;
+			pos  = size - 7;
+
+			// calculate second digit 
+			for (i = size; i >= 1; i--) {
+				sum += raw.charAt(size - i) * pos--;
+
+				if (pos < 2) {
+					pos = 9;
+				}
+			}			
+
+			// get dv mod 
+			res = sum % 11 < 2 ? 0 : 11 - sum % 11;
+
+			// is given second dv valid?
+			if (res != dv.charAt(1)) {
+				return false;
+			}
+
+			// all good ...
+			return true;
+		},
 
 		'matches' : function(a, b) {
 
