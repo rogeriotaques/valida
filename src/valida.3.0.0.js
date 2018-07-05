@@ -10,23 +10,45 @@
  */
 
 (function fn() {
+  const pluginVersion = '3.0.0';
+
   const defaultOptions = {
+    // Enable loggin on javascript console
     debug: false,
+    // HTMLForm property
     novalidate: true,
+    // HTMLForm property
     autocomplete: 'off',
+    // The HTMLElement used to show the validation erros
     tag: 'span',
+    // Tip used to highlight required/optional HTMLFormElements
     highlightMarker: '( Optional )',
+    // Where the tip will be placed in the label
     highlightPosition: 'post',
+    // Whether optional or mandatory HTMLFormElements should be highlighted
     highlightOptional: true,
+    // Check HTMLFormElement content on blur event
     triggerOnBlur: true,
+    // Check HTMLFormElement content on key up/down events
     triggerOnTyping: true,
+    // Additional classes to be added to the validation messages
+    additionalClass: null,
+    // Localization
     i18n: {
+      // All submit buttons on submit replacement
       submit: 'Wait ...',
+      // Validation error message for mandatory HTMLFormElements
       required: 'Required',
+      // Validation error message for invalid (filter) HTMLFormElements
       invalid: 'Seems to be invalid',
+      // Validation success message for valid (filter) HTMLFormElements
+      valid: 'It is valid!',
+      // Tip for textarea HTMLFormElement when maxlength is defined
       maxlength: '<span class="at-counter">{0}</span> out of {1}.'
     },
+    // Callback invoked right before the validation
     beforeValidation: null,
+    // Callback invoked right after the validation
     afterValidation: null
   };
 
@@ -273,21 +295,21 @@
     cnpj: 'XX.XXX.XXX/XXXX-XX'
   };
 
+  const classesToRemove = [
+    '.at-required',
+    '.at-invalid',
+    '.at-valid',
+    '.has-warning',
+    '.has-feedback'
+  ];
+
+  const elementsToRemove = ['.at-error', '.at-warning', '.at-success'];
+
   const methods = {
     init: function init(options = {}) {
       let f; // The form instance
 
       const o = $.extend({}, defaultOptions, options);
-
-      const classesToRemove = [
-        '.at-required',
-        '.at-invalid',
-        '.at-valid',
-        '.has-warning',
-        '.has-feedback'
-      ];
-
-      const elementsToRemove = ['.at-error', '.at-warning', '.at-info'];
 
       const applyMask = (event) => {
         const elem = $(event.currentTarget);
@@ -348,94 +370,83 @@
         }
       }; // clearError
 
-      const placeValidMessage = function pvm(elem) {
-        // const place = elem.attr('data-placement') || 'after';
-        clearError(elem);
+      const placeValidationMessage = function placeValidationMessage(
+        elem,
+        subject = 'valid'
+      ) {
+        const subjectClasses = {
+          valid: {
+            elem: 'at-valid',
+            grp: 'has-error has-feedback',
+            msg: 'at-success'
+          },
+          invalid: {
+            elem: 'at-invalid',
+            grp: 'has-error has-feedback',
+            msg: 'at-warning'
+          },
+          required: {
+            elem: 'at-required',
+            grp: 'has-error has-feedback',
+            msg: 'at-error'
+          }
+        };
 
-        elem.addClass('at-valid');
-
-        if (o.debug) {
-          console.log(
-            '[Valida] ',
-            `#${f.attr('id')}#${elem.attr('id')}`,
-            'is valid'
-          );
-        }
-      }; // placeValidMessage
-
-      /**
-       * Shows the 'warning', compatible with boostrap
-       */
-      const placeInvalidMessage = function pim(elem) {
-        const msg =
-          elem.attr('data-invalid') ||
-          (o.i18n.invalid ? o.i18n.invalid : 'Invalid format');
+        const message =
+          elem.attr(`data-${subject}`) ||
+          (o.i18n[subject] ? o.i18n[subject] : '[Valida] wrong settings');
 
         const place = elem.attr('data-placement') || 'after';
 
         const tag =
           !o.tag || typeof o.tag === 'string'
             ? $(`<${o.tag ? o.tag : 'span'} />`, {
-                class: 'at-error',
-                html: msg
+                class: subjectClasses[subject].msg,
+                html: message
               })
             : o.tag;
 
-        clearError(elem);
+        let target = elem.attr('data-target')
+          ? $(`#${elem.attr('data-target')}`)
+          : elem;
 
-        elem
-          .addClass('at-invalid')
-          .closest('.form-group')
-          .addClass('has-warning has-feedback');
-
-        if (elem.attr('type') !== 'checkbox') {
-          if (place === 'before') {
-            elem.before(tag);
-          } else {
-            elem.after(tag);
-          }
-        } else {
-          elem.parent('label').after(tag);
+        if (o.additionalClass && typeof o.additionalClass === 'string') {
+          tag.addClass(o.additionalClass);
         }
 
-        if (o.debug) {
-          console.log(
-            '[Valida] ',
-            `#${f.attr('id')}#${elem.attr('id')}`,
-            'is invalid'
-          );
+        if (elem.closest('.form-group').hasClass('input-group')) {
+          target = elem.closest('.form-group');
         }
-      }; // placeInvalidMessage
-
-      const placeRequiredMessage = function pem(elem) {
-        const msg =
-          elem.attr('data-required') ||
-          (o.i18n.required ? o.i18n.required : 'Required');
-
-        const place = elem.attr('data-placement') || 'after';
-
-        const tag =
-          !o.tag || typeof o.tag === 'string'
-            ? $(`<${o.tag ? o.tag : 'span'} />`, {
-                class: 'at-error',
-                html: msg
-              })
-            : o.tag;
 
         clearError(elem);
 
-        elem
-          .addClass('at-required')
-          .closest('.form-group')
-          .addClass('has-error has-feedback');
+        elem.addClass(subjectClasses[subject].elem);
+
+        if (
+          elem.parent().hasClass('.form-group') ||
+          elem.parent().hasClass('.field')
+        ) {
+          elem.parent().addClass(subjectClasses[subject].grp);
+        } else if (
+          elem
+            .parent()
+            .parent()
+            .hasClass('.form-group')
+        ) {
+          elem
+            .parent()
+            .parent()
+            .addClass(subjectClasses[subject].grp);
+        }
 
         if (elem.attr('type') !== 'checkbox') {
           if (place === 'before') {
-            elem.before(tag);
+            target.before(tag);
           } else {
-            elem.after(tag);
+            target.after(tag);
           }
         } else {
+          // For checkboxes, placement is ignored
           elem.next('label').after(tag);
         }
 
@@ -443,10 +454,11 @@
           console.log(
             '[Valida] ',
             `#${f.attr('id')}#${elem.attr('id')}`,
-            'is mandatory'
+            `${subject}`,
+            'validation message placed'
           );
         }
-      }; // placeRequiredMessage
+      }; // placeValidationMessage
 
       /**
        * Test element values against given filters
@@ -499,6 +511,10 @@
       const shouldIgnoreThis = function ignore(el) {
         const toIgnore = ['submit', 'reset', 'button', 'image'];
 
+        if (!el.length) {
+          return true;
+        }
+
         if (!el.is('input') && !el.is('textarea') && !el.is('select')) {
           return true;
         }
@@ -526,8 +542,8 @@
        * @param {jQueryHTMLSelectElement} elem
        * @return boolean
        */
-      const isSelectValid = function isv(elem) {
-        return elem.find('option').length === 0 || elem.val() === '';
+      const isSelectValid = function isSelectValid(elem) {
+        return elem.find('option').length !== 0 && elem.val() !== '';
       }; // isSelectValid
 
       /**
@@ -538,13 +554,13 @@
         const elem = $(event.currentTarget);
 
         if (
-          (elem.is('select') && isSelectValid(elem)) ||
-          (elem.is('textarea') && elem.val() === '') ||
-          (elem.is('[type="checkbox"]') &&
+          (elem.is('[required]') &&
+            (elem.is('select') && !isSelectValid(elem))) ||
+          (elem.attr('type') === 'checkbox' &&
             (!elem.is(':checked') || elem.val() === '')) ||
-          (elem.is('input') && elem.val() === '')
+          elem.val() === ''
         ) {
-          placeRequiredMessage(elem);
+          placeValidationMessage(elem, 'required');
         }
       }; // onBlurValidation
 
@@ -555,14 +571,16 @@
       const onValueChange = function change(event) {
         const elem = $(event.currentTarget);
 
-        if (elem.attr('type') !== 'checkbox' && elem.val() !== '') {
-          if (
-            filterValidation(
-              elem,
-              elem.attr('data-filter') || elem.attr('filter') || ''
-            )
-          ) {
-            clearError(elem);
+        if (o.triggerOnBlur) {
+          if (elem.attr('type') !== 'checkbox' && elem.val() !== '') {
+            if (
+              filterValidation(
+                elem,
+                elem.attr('data-filter') || elem.attr('filter') || ''
+              )
+            ) {
+              clearError(elem);
+            }
           }
         }
       }; // onValueChange
@@ -576,27 +594,30 @@
         const filter = elem.attr('data-filter') || elem.attr('filter') || '';
         const isFilterValid = filterValidation(elem, filter);
 
-        if (filter && isFilterValid) {
-          placeValidMessage(elem);
+        if (elem.val() !== '' && filter) {
+          if (isFilterValid) {
+            placeValidationMessage(elem, 'valid');
 
-          if (o.debug) {
-            console.log(
-              '[Valida]',
-              `#${f.attr('id')}#${elem.attr('id')}`,
-              'filter is valid'
-            );
-          }
-        } else if (filter && !isFilterValid && elem.val() !== '') {
-          placeInvalidMessage(elem);
+            if (o.debug) {
+              console.log(
+                '[Valida]',
+                `#${f.attr('id')}#${elem.attr('id')}`,
+                'filter is valid'
+              );
+            }
+          } else {
+            placeValidationMessage(elem, 'invalid');
 
-          if (o.debug) {
-            console.log(
-              '[Valida]',
-              `#${f.attr('id')}#${elem.attr('id')}`,
-              'filter is invalid'
-            );
+            if (o.debug) {
+              console.log(
+                '[Valida]',
+                `#${f.attr('id')}#${elem.attr('id')}`,
+                'filter is invalid'
+              );
+            }
           }
         } else {
+          console.log('HI');
           clearError(elem);
         }
       }; // onTypingValidation
@@ -614,47 +635,47 @@
         elem,
         showError = true,
         forceClear = true,
-        prevState = false
+        prevState = true
       ) {
         const el = typeof elem === 'object' ? elem : $(elem);
-        let err = prevState === undefined ? false : prevState;
+        let valid = prevState || true;
 
         if (forceClear) {
           clearError(el); // reset previous error messages ...
         }
 
         // sometimes needs to ignore ...
-        if (!el.length || shouldIgnoreThis(el)) {
-          return !err;
+        if (shouldIgnoreThis(el)) {
+          return valid;
         } // ignore
 
         if (el.is('[required]')) {
           if (
-            (el.is('select') && isSelectValid(el)) ||
-            (el.attr('type') === 'checkbox' && !el.is(':checked')) ||
+            (el.is('select') && !isSelectValid(el)) ||
+            (el.attr('type') === 'checkbox' &&
+              (!el.is(':checked') || el.val() === '')) ||
             el.val() === ''
           ) {
-            err = true;
+            valid = false;
 
             if (showError) {
-              placeRequiredMessage(el);
+              placeValidationMessage(el, 'required');
             }
           } // empty
         } // required
 
         if (
-          !el.is('[required]') &&
           (el.attr('data-filter') || el.attr('filter')) &&
           !filterValidation(el, el.attr('data-filter') || el.attr('filter'))
         ) {
-          err = true;
+          valid = false;
 
           if (showError) {
-            placeInvalidMessage(el);
+            placeValidationMessage(el, 'invalid');
           }
         }
 
-        return !err;
+        return valid;
       }; // partialValidation
 
       return this.each(function instance() {
@@ -743,7 +764,7 @@
                 clearError(elem);
 
                 if (!elem.is(':checked')) {
-                  placeRequiredMessage(elem);
+                  placeValidationMessage(elem, 'required');
                 }
               });
             } else {
@@ -761,8 +782,8 @@
           // When a textarea has the maxlength set
           if (elem.is('textarea') && elem.attr('maxlength')) {
             elem.after(
-              $('<div />', {
-                class: 'at-description',
+              $('<span />', {
+                class: 'at-description help-block',
                 html: (
                   elem.attr('data-help') ||
                   (o.i18n.maxlength
@@ -843,7 +864,7 @@
             requiredElem
           ) {
             const elemForValidation = $(requiredElem);
-            error = !partialValidation(elemForValidation, true, false, error);
+            error = !partialValidation(elemForValidation, true, false, !error);
           }); // required elements
 
           if (o.afterValidation && $.isFunction(o.afterValidation)) {
@@ -865,10 +886,68 @@
                 el.text(el.attr('data-old-value'));
               }
             });
+
+            // Get the center of window
+            const centerViewPort = Math.ceil($(window).height() / 2);
+
+            if ($('.at-required, .at-invalid').filter(':visible').length > 0) {
+              // Let's meet the first field with error ...
+              $('html, body').animate(
+                {
+                  scrollTop:
+                    $('.at-required, .at-invalid')
+                      .filter(':visible')
+                      .filter(':first')
+                      .offset().top - centerViewPort
+                },
+                'fast',
+                function centering() {
+                  $('.at-required, .at-invalid')
+                    .filter(':visible')
+                    .filter(':first')
+                    .focus();
+                }
+              );
+            }
           }
         });
       });
-    }
+    }, // init
+
+    version: function version() {
+      return $(this).text(pluginVersion);
+    }, // version
+
+    destroy: function destroy() {
+      const f = $(this);
+
+      // restore original form attributes
+      f.attr('autocomplete', f.data('old-autocomplete'));
+      f.attr('novalidate', f.data('old-novalidate'));
+
+      // unbind all for reset buttons
+      f.find('[type=reset]').off('valida');
+      f.find('[type=reset]').unbind('.valida');
+
+      // unbind all form fields
+      f.find('input, select, textarea').off('valida');
+      f.find('input, select, textarea').unbind('.valida');
+
+      // remove counter of textareas' content.
+      f.find('.at-description').remove();
+
+      // remove all validation warnings
+      f.find(elementsToRemove.join(',')).remove();
+      f.find(classesToRemove.join(',')).removeClass(
+        classesToRemove.map((cls) => cls.replace(/^./, '')).join(' ')
+      );
+
+      // and finally unbind all for the form ...
+      f.off('valida');
+      f.unbind('.valida');
+
+      f.valida = null;
+    } // destroy
   };
 
   $.fn.valida = function valida(method) {

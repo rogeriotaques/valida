@@ -8,7 +8,9 @@
 </head>
 
 <body>
-  <p>Valida 3.0.0</p>
+  <p>Valida
+    <span id="ver"></span>
+  </p>
 
   <form method="GET" action="" id="sample-form-1">
     <p>Form #1</p>
@@ -107,6 +109,7 @@
       $('#sample-form-1').valida({
         // debug: true
       });
+      $('#ver').valida('version');
     })();
   </script>
 </body>
