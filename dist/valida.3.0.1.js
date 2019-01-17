@@ -3,14 +3,16 @@
  *
  * @copyright © 2011-2018, Rogerio Taques
  * @author Rogerio Taques (rogerio.taques@gmail.com)
- * @version 3.0.0
+ * @version 3.0.1
  * @license http://www.opensource.org/licenses/mit-license.php
  * @see https://github.com/rogeriotaques/valida
  * @cat Plugins/Form Validation
  */
 
+/* eslint wrap-iife: 0 */
+
 (function fn() {
-  const pluginVersion = '3.0.0';
+  const pluginVersion = '3.0.1';
 
   const defaultOptions = {
     // Enable loggin on javascript console
@@ -98,7 +100,14 @@
     max_length: (s, l) => s.length <= parseInt(l, 10),
 
     matches: (a, b) => {
-      const c = $(`#${b}`).val() || b;
+      let c = null;
+
+      try {
+        c = $(`#${b}`).val() || b;
+      } catch (ex) {
+        c = b;
+      }
+
       return a === c;
     },
 
@@ -454,8 +463,7 @@
           console.log(
             '[Valida] ',
             `#${f.attr('id')}#${elem.attr('id')}`,
-            `${subject}`,
-            'validation message placed'
+            `${subject}`
           );
         }
       }; // placeValidationMessage
@@ -470,7 +478,7 @@
 
         let error = false;
 
-        list.forEach(function listPatt(patt) {
+        list.forEach((patt) => {
           let pattern = patt;
 
           if (typeof pattern !== 'undefined' && pattern.indexOf(':') !== -1) {
@@ -528,7 +536,7 @@
       const resetCallback = function reset() {
         $(this)
           .off('click.valida')
-          .on('click.valida', function click() {
+          .on('click.valida', () => {
             clearAllErrors(f);
 
             f.find('input, select, textarea')
@@ -617,7 +625,6 @@
             }
           }
         } else {
-          console.log('HI');
           clearError(elem);
         }
       }; // onTypingValidation
@@ -638,7 +645,7 @@
         prevState = true
       ) {
         const el = typeof elem === 'object' ? elem : $(elem);
-        let valid = prevState || true;
+        let valid = typeof prevState !== 'undefined' ? prevState : true;
 
         if (forceClear) {
           clearError(el); // reset previous error messages ...
@@ -696,7 +703,7 @@
         f.find('[type=reset]').each(resetCallback); // reset buttons
 
         // Find elements to be validated
-        f.find('input, select, textarea').each(function el(i, elFound) {
+        f.find('input, select, textarea').each((i, elFound) => {
           const elem = $(elFound);
 
           const placeMarker = function pm(lbl) {
@@ -760,7 +767,7 @@
           // When need to validate on blur
           if (o.triggerOnBlur && elem.is('[required]')) {
             if (elem.attr('type') === 'checkbox') {
-              elem.off('click.valida').on('click.valida', function occ() {
+              elem.off('click.valida').on('click.valida', () => {
                 clearError(elem);
 
                 if (!elem.is(':checked')) {
@@ -797,7 +804,7 @@
 
             elem
               .off('keyup.valida keydown.valida')
-              .on('keyup.valida keydown.valida', function kc(ev) {
+              .on('keyup.valida keydown.valida', (ev) => {
                 if (elem.val().length > elem.attr('maxlength')) {
                   ev.preventDefault();
                   return;
@@ -830,17 +837,17 @@
         }); // elements
 
         // When form is submitted
-        f.off('submit.valida').on('submit.valida', function ofs(submitEvent) {
-          let error = false;
+        f.off('submit.valida').on('submit.valida', (submitEvent) => {
+          let canSubmit = true;
 
           clearAllErrors(f);
 
           if (o.beforeValidation && $.isFunction(o.beforeValidation)) {
-            error = !o.beforeValidation.apply(this, submitEvent);
+            canSubmit = o.beforeValidation(submitEvent);
           }
 
           // Prevent double clicks
-          f.find('[type="submit"]').each(function eachSubmit(i, submitElem) {
+          f.find('[type="submit"]').each((i, submitElem) => {
             const el = $(submitElem);
 
             el.prop('disabled', true);
@@ -859,33 +866,23 @@
           });
 
           // Run the validation against the required elements
-          f.find('input, select, textarea').each(function eachElement(
-            i,
-            requiredElem
-          ) {
+          f.find('input, select, textarea').each((i, requiredElem) => {
             const elemForValidation = $(requiredElem);
-            error = !partialValidation(elemForValidation, true, false, !error);
+            canSubmit = partialValidation(
+              elemForValidation,
+              true,
+              false,
+              canSubmit
+            );
           }); // required elements
 
           if (o.afterValidation && $.isFunction(o.afterValidation)) {
-            error = !o.afterValidation.apply(this, submitEvent, error);
+            // when canSubmit is true, no errors, right?
+            canSubmit = o.afterValidation(submitEvent, !canSubmit);
           }
 
-          if (error) {
+          if (!canSubmit) {
             submitEvent.preventDefault();
-
-            // Re-enable submit buttons
-            f.find('[type="submit"]').each(function eachSubmit(i, submitElem) {
-              const el = $(submitElem);
-
-              el.prop('disabled', false);
-
-              if (el.is('input')) {
-                el.val(el.attr('data-old-value'));
-              } else {
-                el.text(el.attr('data-old-value'));
-              }
-            });
 
             // Get the center of window
             const centerViewPort = Math.ceil($(window).height() / 2);
@@ -901,7 +898,7 @@
                       .offset().top - centerViewPort
                 },
                 'fast',
-                function centering() {
+                () => {
                   $('.at-required, .at-invalid')
                     .filter(':visible')
                     .filter(':first')
@@ -909,7 +906,20 @@
                 }
               );
             }
-          }
+
+            // Re-enable submit buttons
+            f.find('[type="submit"]').each((i, submitElem) => {
+              const el = $(submitElem);
+
+              el.prop('disabled', false);
+
+              if (el.is('input')) {
+                el.val(el.attr('data-old-value'));
+              } else {
+                el.text(el.attr('data-old-value'));
+              }
+            }); // re-enable buttons
+          } // !canSubmit
         });
       });
     }, // init

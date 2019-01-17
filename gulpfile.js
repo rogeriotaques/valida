@@ -10,6 +10,7 @@ var browserSync = require('browser-sync').create();
 var eslint = require('gulp-eslint');
 var minify = require('gulp-minify');
 var named = require('vinyl-named');
+var del = require('del');
 
 // ~~ VARS ~~
 
@@ -49,7 +50,7 @@ gulp.task('server', ['javascript'], function() {
 });
 
 // Transpile, parse and bundle javascript files
-gulp.task('javascript', function(cb) {
+gulp.task('javascript', ['clean'], function(cb) {
   return gulp
     .src([
       FILE_PATH.SRC + '/*.js',
@@ -63,6 +64,15 @@ gulp.task('javascript', function(cb) {
     .pipe(gulp.dest(FILE_PATH.DIST))
     .pipe(browserSync.reload({ stream: true }));
 });
+
+// Remove old assets
+gulp.task('clean', function(cb) {
+  del([FILE_PATH.DIST]);
+  cb();
+});
+
+// Build production
+gulp.task('build', ['javascript']);
 
 // Start development ...
 gulp.task('default', ['server']);

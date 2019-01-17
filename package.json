@@ -1,6 +1,6 @@
 {
   "name": "valida",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A client-side form validator for jQuery.",
   "main": "./src/valida.js",
   "scripts": {
@@ -29,6 +29,7 @@
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.7.0",
     "browser-sync": "^2.24.5",
+    "del": "^3.0.0",
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-plugin-import": "^2.13.0",
     "gulp": "^3.9.1",
